@@ -18,39 +18,23 @@ def normalize_data(df):
 
 def visualize():
     df = pd.read_csv("prices_data/price_data.csv", index_col = 0)
+    df = df.iloc[::-1]
     print(df)
-
-
-    df.plot(figsize=(23,8),title = "Apple Stock Price Analysis")
-    plt.subplot(411)
-    plt.plot(df.Open, label='Original')
-    plt.legend(loc='best')
-    plt.subplot(412)
-    plt.plot(df.Low, label='Trend')
-    plt.legend(loc='best')
-    plt.subplot(413)
-    plt.plot(df.High,label='Seasonality')
-    plt.legend(loc='best')
-    plt.subplot(414)
-    plt.plot(df.Volume, label='Residuals')
-    plt.legend(loc='best')
-    plt.tight_layout()
-    plt.show()
     
     df = normalize_data(df)
-    df.plot(figsize=(23,10))
-    plt.show()
-    plt.subplot(411)
+    plt.subplot(1,2,1)
     plt.plot(df.Open, label='Original')
     plt.legend(loc='best')
-    plt.subplot(412)
     plt.plot(df.Low, label='Trend')
     plt.legend(loc='best')
-    plt.subplot(413)
     plt.plot(df.High,label='Seasonality')
     plt.legend(loc='best')
-    plt.subplot(414)
+    plt.subplot(1,2,2)
     plt.plot(df.Volume, label='Residuals')
     plt.legend(loc='best')
     plt.tight_layout()
     plt.show()
+
+    return df
+
+visualize()
