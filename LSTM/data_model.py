@@ -19,6 +19,8 @@ import h5py
 import requests
 import os
 import seaborn as sns
+import sys
+sys.path.insert(0, '../')
 sns.set()
 
 def load_data(stock, seq_len):

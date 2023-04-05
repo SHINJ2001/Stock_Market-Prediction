@@ -17,10 +17,10 @@ def normalize_data(df):
     return df
 
 def visualize():
-    df = pd.read_csv("prices_data/price_data.csv", index_col = 0)
-    df = df.iloc[::-1]
-    
+    df = pd.read_csv("prices_data/price_data.csv", parse_dates=['Date'])
     df2 = normalize_data(df)
+    df = df2.truncate(after = 250)
+
     plt.subplot(1,2,1)
     plt.plot(df.Open, label='Open')
     plt.legend(loc='best')
@@ -32,12 +32,10 @@ def visualize():
     plt.subplot(1,2,2)
     plt.plot(df.Volume, label='Volume')
     plt.legend(loc='best')
+    plt.gca().invert_xaxis()
     plt.tight_layout()
     plt.show()
 
-    plt.scatter(df)
-    plt.show()
-
-    return df2
+    return df
 
 visualize()
