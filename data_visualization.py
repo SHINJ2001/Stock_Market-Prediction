@@ -19,22 +19,25 @@ def normalize_data(df):
 def visualize():
     df = pd.read_csv("prices_data/price_data.csv", index_col = 0)
     df = df.iloc[::-1]
-    print(df)
     
-    df = normalize_data(df)
+    df2 = normalize_data(df)
     plt.subplot(1,2,1)
-    plt.plot(df.Open, label='Original')
+    plt.plot(df.Open, label='Open')
     plt.legend(loc='best')
-    plt.plot(df.Low, label='Trend')
+    plt.plot(df.Low, label='Low')
     plt.legend(loc='best')
-    plt.plot(df.High,label='Seasonality')
+    plt.plot(df.High,label='High')
     plt.legend(loc='best')
+    plt.plot(df.Close, label='Close')
     plt.subplot(1,2,2)
-    plt.plot(df.Volume, label='Residuals')
+    plt.plot(df.Volume, label='Volume')
     plt.legend(loc='best')
     plt.tight_layout()
     plt.show()
 
-    return df
+    plt.scatter(df)
+    plt.show()
+
+    return df2
 
 visualize()
