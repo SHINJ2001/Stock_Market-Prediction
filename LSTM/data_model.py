@@ -8,7 +8,6 @@ import itertools
 from sklearn import preprocessing
 import datetime
 from operator import itemgetter
-from sklearn.metrics import mean_squared_error
 from math import sqrt
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
@@ -50,7 +49,7 @@ def load_data(stock, seq_len):
 def build_model(layers):
     d = 0.3
     model = Sequential()
-    
+
     model.add(LSTM(256, input_shape=(layers[1], layers[0]), return_sequences=True))
     model.add(Dropout(d))
         
@@ -72,6 +71,7 @@ def model_score(model, X_train, y_train, X_test, y_test):
     print('Train Score: %.5f MSE (%.2f RMSE)' % (trainScore[0], math.sqrt(trainScore[0])))
 
     testScore = model.evaluate(X_test, y_test, verbose=0)
+
     print('Test Score: %.5f MSE (%.2f RMSE)' % (testScore[0], math.sqrt(testScore[0])))
     return trainScore[0], testScore[0]
 
@@ -86,36 +86,34 @@ def denormalize(df, normalized_value):
     new = min_max_scaler.inverse_transform(normalized_value)
     return new
 
-df = visualize()
-window = 22
-X_train, y_train, X_test, y_test = load_data(df, window) #where window is the
-                                                         #batch size
-model = build_model([5,window,1])
+def lstm(df):
+    df.set_index("Date", inplace = True)
+    window = 22
+    X_train, y_train, X_test, y_test = load_data(df, window) #where window is the
+                                                             #batch size
+    model = build_model([5,window,1])
+    
+    model.fit(X_train,y_train,batch_size=2048,epochs=50,validation_split=0.1,verbose=1)
+    
+    # print(X_test[-1])
+    diff=[]
+    ratio=[]
+    p = model.predict(X_test)
+    # for each data index in test data
+    for u in range(len(y_test)):
+        pr = p[u][0]
+        ratio.append((y_test[u]/pr)-1)
+        diff.append(abs(y_test[u]- pr))
+    
+    newp = denormalize(df, p)
+    newy_test = denormalize(df, y_test)
+    
+    score = model_score(model, X_train, y_train, X_test, y_test)
+    
+    plt.figure(figsize=(25,8))
+    plt.plot(newp,color='red', label='Prediction')
+    plt.plot(newy_test,color='blue', label='Actual')
+    plt.legend(loc='best')
+    plt.show()
 
-model.fit(X_train,y_train,batch_size=2048,epochs=50,validation_split=0.1,verbose=1)
-
-# print(X_test[-1])
-diff=[]
-ratio=[]
-p = model.predict(X_test)
-# for each data index in test data
-for u in range(len(y_test)):
-    # pr = prediction day u
-    pr = p[u][0]
-    # (y_test day u / pr) - 1
-    ratio.append((y_test[u]/pr)-1)
-    diff.append(abs(y_test[u]- pr))
-    # print(u, y_test[u], pr, (y_test[u]/pr)-1, abs(y_test[u]- pr))
-    # Last day prediction
-    # print(p[-1]) 
-
-newp = denormalize(df, p)
-newy_test = denormalize(df, y_test)
-
-model_score(model, X_train, y_train, X_test, y_test)
-
-plt.figure(figsize=(25,8))
-plt.plot(newp,color='red', label='Prediction')
-plt.plot(newy_test,color='blue', label='Actual')
-plt.legend(loc='best')
-plt.show()
+    return score[1]

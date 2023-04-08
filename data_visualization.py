@@ -6,6 +6,9 @@ import math, time
 import itertools
 from sklearn import preprocessing
 import datetime
+plt.style.use('seaborn-darkgrid')
+import warnings
+warnings.filterwarnings("ignore")
 
 def normalize_data(df):
     min_max_scaler = preprocessing.MinMaxScaler()
@@ -17,23 +20,23 @@ def normalize_data(df):
     return df
 
 def visualize():
-    df = pd.read_csv("prices_data/price_data.csv", parse_dates=['Date'])
-    df2 = normalize_data(df)
-    df = df2.truncate(after = 250)
-
+    df = pd.read_csv("prices_data/price_data.csv", parse_dates = ['Date'])
+    df2 = df.truncate(before = '2023-01-01')
+    
+    df2.set_index("Date")
     plt.subplot(1,2,1)
-    plt.plot(df.Open, label='Open')
+    plt.plot(df2.Open, label='Open')
     plt.legend(loc='best')
-    plt.plot(df.Low, label='Low')
+    plt.plot(df2.Low, label='Low')
     plt.legend(loc='best')
-    plt.plot(df.High,label='High')
+    plt.plot(df2.High,label='High')
     plt.legend(loc='best')
-    plt.plot(df.Close, label='Close')
+    plt.plot(df2.Close, label='Close')
     plt.subplot(1,2,2)
-    plt.plot(df.Volume, label='Volume')
+    plt.plot(df2.Volume, label='Volume')
     plt.legend(loc='best')
-    plt.gca().invert_xaxis()
     plt.tight_layout()
+    plt.gcf().autofmt_xdate()
     plt.show()
 
     return df
