@@ -1,4 +1,3 @@
-from data_visualization import visualize
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -21,6 +20,15 @@ import seaborn as sns
 import sys
 sys.path.insert(0, '../')
 sns.set()
+
+def normalize_data(df):
+    min_max_scaler = preprocessing.MinMaxScaler()
+    df['Open'] = min_max_scaler.fit_transform(df.Open.values.reshape(-1,1))
+    df['High'] = min_max_scaler.fit_transform(df.High.values.reshape(-1,1))
+    df['Low'] = min_max_scaler.fit_transform(df.Low.values.reshape(-1,1))
+    df['Volume'] = min_max_scaler.fit_transform(df.Volume.values.reshape(-1,1))
+    df['Close'] = min_max_scaler.fit_transform(df.Close.values.reshape(-1,1))
+    return df
 
 def load_data(stock, seq_len):
     amount_of_features = len(stock.columns) # 5
@@ -87,7 +95,8 @@ def denormalize(df, normalized_value):
     return new
 
 def lstm(df):
-    df.set_index("Date", inplace = True)
+
+    normalize_data(df)
     window = 22
     X_train, y_train, X_test, y_test = load_data(df, window) #where window is the
                                                              #batch size
@@ -117,3 +126,7 @@ def lstm(df):
     plt.show()
 
     return score[1]
+
+df = pd.read_csv('../prices_data/price_data.csv', parse_dates = ['Date'],
+        index_col = 0)
+lstm(df)

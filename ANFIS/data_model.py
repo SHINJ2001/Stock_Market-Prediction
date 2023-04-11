@@ -6,12 +6,16 @@ import matplotlib.pyplot as plt
 import sklearn.metrics
 import math 
 import sys
+from sklearn import preprocessing
 sys.path.insert(0, '../')
 from sklearn.model_selection import train_test_split
 import warnings
 warnings.filterwarnings("ignore")
 
-def anfis(df):
+def anfis(orig_df):
+
+    df = orig_df.copy()
+
     # Define the input and output variables
     input_variable = ctrl.Antecedent(np.arange(0, 101, 1), 'input_variable')
     output_variable = ctrl.Consequent(np.arange(0, 101, 1), 'output_variable')
@@ -55,3 +59,6 @@ def anfis(df):
     plt.show()
 
     return rmse
+
+df = pd.read_csv('../prices_data/price_data.csv', parse_dates = ['Date'])
+print(anfis(df))
